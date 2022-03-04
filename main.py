@@ -1,27 +1,51 @@
 import enchant
 
+# https://www.wordhippo.com/what-is/starting-with/5-letter-words-ae.html
+
 correctLetters = ["?", "?", "?", "?", "?"]
+untriedLettersArray = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+                  "U", "V", "W", "X", "Y", "Z"]
+untriedLettersStr = ""
 words = []
 triedLetters = []
 tried = 0
 
+def cleanAndPrint():
+    cleanCorrectLetters()
+    print(correctLetters)
+    print(untriedLetters)
+def removeTriedLetter(letter):
+    global untriedLettersArray, untriedLetters
+    counter = 0
+    while counter < len(untriedLettersArray):
+        if untriedLettersArray[counter] == letter:
+            untriedLettersArray.pop(counter)
+        counter += 1
+    untriedLetters = ""
+    for x in untriedLettersArray:
+        untriedLetters = untriedLetters + x + ", "
+    untriedLetters = untriedLetters[0:len(untriedLetters)-2]
 def checkWord(word):
     englishDict = enchant.Dict("en_US")
     return englishDict.check(word)
 def addAttempt(word, result):
-    global tried
+    global tried, verbose
     words.append(word)
     triedLetters.append(result)
     findCorrectLetters(tried)
     tried += 1
-    print()
+    if(verbose):
+        print()
 
 def findCorrectLetters(index):
+    global verbose
     resultSequence = triedLetters[index]
     counter = 0
     for x in resultSequence:
         if x == "1":
-            print(f"[{words[index][counter]}] correct char found but out of position at {counter}")
+            if(verbose):
+                print(f"[{words[index][counter]}] correct char found but out of position at {counter}")
+            removeTriedLetter(words[index][counter])
             intCounter = 0
             for y in correctLetters:
                 if intCounter == counter:
@@ -32,7 +56,9 @@ def findCorrectLetters(index):
                         correctLetters[intCounter] = correctLetters[intCounter] + ":~" + str(words[index][counter])
                 intCounter += 1
         elif x == "2":
-            print(f"[{words[index][counter]}] correct char found at {counter}")
+            if(verbose):
+                print(f"[{words[index][counter]}] correct char found at {counter}")
+            removeTriedLetter(words[index][counter])
             correctLetters[counter] = words[index][counter]
         counter += 1
 
@@ -74,12 +100,13 @@ def cleanCorrectLetters():
                       str(correctLettersSplit5)[2:-2].replace("', '","")]
 
 
-
+verbose = False
 addAttempt("CRANE", "00101")  # 1/6
 addAttempt("EAGLE", "11000")  # 2/6
-cleanCorrectLetters()
-print(correctLetters)
-# addAttempt("BILLY", "10002")  # 3/6
-# addAttempt("BILLY", "10002")  # 4/6
-# addAttempt("BILLY", "10002")  # 5/6
-# addAttempt("BILLY", "10002")  # 6/6
+addAttempt("ABBEY", "20010")  # 3/6
+addAttempt("ADEPT", "21200")  # 4/6
+addAttempt("AGENT", "20200")  # 5/6
+# addAttempt("AHEAD", "22222")  # 6/6
+cleanAndPrint()
+
+# print("abbey", checkWord("abbey"))
